@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">1xBet</string>
+    <string name="censorship">18+</string>
+    <string name="confirmAge">мне есть 18</string>
+    <string name="refuteAge">Я младше 18</string>
+    <string name="conditions">Нажимая кнопку ПРИНЯТЬ, вы ознакомляетесь и принимаете лицензионное соглашение и политику конфиденциальности</string>
+    <string name="accept">Принять</string>
+    <string name="dismiss">отклонить</string>
+    <string name="matchCenter">МАТЧ ЦЕНТР</string>
+    <string name="signIn">войти</string>
+    <string name="loadData">Загружаем матчи…</string>
+    <string name="separator">:</string>
+    <string name="loadLicenseAgreement">Загружаем лицензионное соглашение…</string>
+    <string name="warning">Gambling can be addictive. Know your limits</string>
+    <string name="ad">AD</string>
+    <string name="backgroundImageContent">Background</string>
+    <string name="loadPrivacyPolicy">Загружаем политику конфеденциальности…</string>
+    <string name="appIconContent">AppIcon</string>
+    <string name="football">Футбол</string>
+    <string name="hockey">Хоккей</string>
+    <string name="basketball">Баскетбол</string>
+    <string name="tennis">Теннис</string>
+    <string name="tableTennis">Настольный теннис</string>
+    <string name="live">Live</string>
+    <string name="soon">Скоро</string>
+    <string name="backArrow">backArrow</string>
+</resources>
