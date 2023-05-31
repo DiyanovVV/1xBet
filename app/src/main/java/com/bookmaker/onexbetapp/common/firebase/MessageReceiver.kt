@@ -9,7 +9,7 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.test.core.app.ApplicationProvider
-import com.bookmaker.onexbetapp.MainActivity
+import com.bookmaker.onexbetapp.view.MainActivity
 import com.bookmaker.onexbetapp.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage

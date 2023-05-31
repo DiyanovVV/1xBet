@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "500107468923",
+    "firebase_url": "https://app-176d1-default-rtdb.firebaseio.com",
+    "project_id": "app-176d1",
+    "storage_bucket": "app-176d1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500107468923:android:ce97aa578fc13c7befc2de",
+        "android_client_info": {
+          "package_name": "com.bookmaker.onexbetapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz8uTsY7WeE4iSb0rEm9Z-KSfYpDpTvi8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/ageAskFragment">
+
+    <fragment
+        android:id="@+id/ageAskFragment"
+        android:name="com.bookmaker.onexbetapp.view.AgeAskFragment"
+        android:label="fragment_age_ask"
+        tools:layout="@layout/fragment_age_ask" >
+        <action
+            android:id="@+id/action_ageAskFragment_to_conditionsAskFragment"
+            app:destination="@id/conditionsAskFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/conditionsAskFragment"
+        android:name="com.bookmaker.onexbetapp.view.ConditionsAskFragment"
+        android:label="fragment_conditions_ask"
+        tools:layout="@layout/fragment_conditions_ask" >
+        <action
+            android:id="@+id/action_conditionsAskFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+        <action
+            android:id="@+id/action_conditionsAskFragment_to_licenseAgreementShowFragment"
+            app:destination="@id/licenseAgreementShowFragment" />
+        <action
+            android:id="@+id/action_conditionsAskFragment_to_privacyPolicyShowFragment"
+            app:destination="@id/privacyPolicyShowFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/licenseAgreementShowFragment"
+        android:name="com.bookmaker.onexbetapp.view.LicenseAgreementShowFragment"
+        android:label="fragment_license_agreement_show"
+        tools:layout="@layout/fragment_license_agreement_show" />
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.bookmaker.onexbetapp.view.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" />
+    <fragment
+        android:id="@+id/privacyPolicyShowFragment"
+        android:name="com.bookmaker.onexbetapp.view.PrivacyPolicyShowFragment"
+        android:label="fragment_privacy_policy_show"
+        tools:layout="@layout/fragment_privacy_policy_show" />
+</navigation>
