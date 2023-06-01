@@ -2,6 +2,7 @@ package com.bookmaker.onexbetapp.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.bookmaker.onexbetapp.common.systemUtils.Constants.SPORTS
@@ -17,6 +18,7 @@ class MatchCenterActivity : AppCompatActivity() {
     private lateinit var viewModel: MatchCenterViewModel
     private var sport = 0
     private var time = 0
+    private var soon: Boolean = false
     private lateinit var events: Map<String, Sport>
     private lateinit var adapter: MatchCenterLeaguesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,21 +29,20 @@ class MatchCenterActivity : AppCompatActivity() {
         viewModel.updateData()
         adapter = MatchCenterLeaguesAdapter()
         binding.rvLeagues.adapter = adapter
+        binding.pbLoadStatus.max = 100
         viewModel.errors.observe(this){
             Toast.makeText(this, "Network error - $it", Toast.LENGTH_SHORT).show()
         }
-        viewModel.loadProgress.observe(this){
-            binding.pbLoadStatus.progress = it
-        }
         viewModel.events.observe(this){
             events = it
+            soon = viewModel.soonUpdated
+            viewModel.soonUpdated = false
             dataInRvUpdate()
             binding.tvLoadStatus.visibility = View.GONE
             binding.pbLoadStatus.visibility = View.GONE
             binding.rvLeagues.visibility = View.VISIBLE
             binding.tlSports.visibility = View.VISIBLE
             binding.tlTime.visibility = View.VISIBLE
-
         }
         binding.tlSports.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -75,9 +76,11 @@ class MatchCenterActivity : AppCompatActivity() {
         if (time == 0){
             adapter.submitList(events[SPORTS[sport]]!!.live)
         } else{
-            adapter.submitList(events[SPORTS[sport]]!!.soon)
+            if(soon || doScroll){
+                soon = false
+                adapter.submitList(events[SPORTS[sport]]!!.soon)
+            }
         }
-
         if (doScroll){
             binding.rvLeagues.scrollToPosition(0)
             Folder.leaguesUnfoldedIds = mutableListOf()

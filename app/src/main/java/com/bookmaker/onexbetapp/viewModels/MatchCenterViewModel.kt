@@ -35,10 +35,7 @@ class MatchCenterViewModel : ViewModel() {
     val errors: LiveData<String>
         get() = _errors
 
-    private val _loadProgress: MutableLiveData<Int> = MutableLiveData()
-    val loadProgress: LiveData<Int>
-        get() = _loadProgress
-
+    var soonUpdated = false
     private val _events: MutableLiveData<Map<String, Sport>> = MutableLiveData()
     val events: LiveData<Map<String, Sport>>
         get() = _events
@@ -50,7 +47,13 @@ class MatchCenterViewModel : ViewModel() {
         SPORTS[4] to Sport(mutableListOf(), mutableListOf())
     )
     var parsedCount = 0
+    var started = 0
+    private var sent = 0
+    private var finished = 0
     var allItemsCount = 0
+    private var lastValue = 0
+    private var time: Long = 0
+
     fun updateData() {
         resultData = mapOf(
             SPORTS[0] to Sport(mutableListOf(), mutableListOf()),
@@ -62,7 +65,6 @@ class MatchCenterViewModel : ViewModel() {
 
         viewModelScope.launch {
             val allEvents = Repository.playmaker.getGames()
-            _loadProgress.value = 0
             if (allEvents.isSuccessful) {
                 allItemsCount = allEvents.body()!!.size
                 parsedCount = 0
@@ -128,8 +130,8 @@ class MatchCenterViewModel : ViewModel() {
                                             )
                                         }
                                     }
-                                    parsedCount += 1
                                 } else { // if event is live
+                                    sent += 1
                                     GlobalScope.launch {
                                         loadInfo(i, 0)
                                     }
@@ -195,8 +197,8 @@ class MatchCenterViewModel : ViewModel() {
                                             )
                                         }
                                     }
-                                    parsedCount += 1
                                 } else { // if event is live
+                                    sent += 1
                                     GlobalScope.launch {
                                         loadInfo(i, 1)
                                     }
@@ -262,8 +264,8 @@ class MatchCenterViewModel : ViewModel() {
                                             )
                                         }
                                     }
-                                    parsedCount += 1
                                 } else { // if event is live
+                                    sent += 1
                                     GlobalScope.launch {
                                         loadInfo(i, 2)
                                     }
@@ -329,8 +331,8 @@ class MatchCenterViewModel : ViewModel() {
                                             )
                                         }
                                     }
-                                    parsedCount += 1
                                 } else { // if event is live
+                                    sent += 1
                                     GlobalScope.launch {
                                         loadInfo(i, 3)
                                     }
@@ -396,8 +398,8 @@ class MatchCenterViewModel : ViewModel() {
                                             )
                                         }
                                     }
-                                    parsedCount += 1
                                 } else { // if event is live
+                                    sent += 1
                                     GlobalScope.launch {
                                         loadInfo(i, 4)
                                     }
@@ -406,12 +408,26 @@ class MatchCenterViewModel : ViewModel() {
                         }
                     } catch (e: NullPointerException) {
                     }
-                    // count parsed up
-                    _loadProgress.value =
-                        ((parsedCount.toFloat() / allItemsCount.toFloat()) * 100).toInt()
+                    parsedCount += 1
                 }
             } else {
                 _errors.value = allEvents.code().toString()
+            }
+            soonUpdated = true
+            while (started != finished){
+                Log.d("loop", "$sent - sent $finished - finished $started - started $time - time $lastValue - lastValue")
+                if (finished == lastValue){
+                    if(time == 0.toLong()){
+                        time = System.currentTimeMillis()
+                    } else if (System.currentTimeMillis() - time > 1000){
+                        break
+                    }
+                } else{
+                    lastValue = finished
+                    time = 0.toLong()
+                }
+
+
             }
             _events.value = resultData
         }
@@ -419,6 +435,7 @@ class MatchCenterViewModel : ViewModel() {
 
 
     private suspend fun loadInfo(i: EventsResponse, sport: Int) {
+        started += 1
         when (sport) {
             0 -> {
                 val date =
@@ -719,9 +736,8 @@ class MatchCenterViewModel : ViewModel() {
             }
             else -> {}
         }
-        _events.postValue(resultData)
+        finished += 1
         parsedCount += 1
-        _loadProgress.postValue(((parsedCount.toFloat() / allItemsCount.toFloat()) * 100).toInt())
     }
 
 }
