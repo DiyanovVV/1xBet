@@ -12,7 +12,7 @@ class PlaymakerRepository () {
         return PlaymakerRetrofitInstance.api.getGames(API_KEY)
     }
 
-    suspend fun getOtherInfo(id: Long): Response<ScoreInfo>{
-        return PlaymakerRetrofitInstance.api.getOtherGameInfo(API_KEY, IdPostBody(id))
+    suspend fun getOtherInfo(ids: List<Long>): Response<ScoreInfo>{
+        return PlaymakerRetrofitInstance.api.getOtherGameInfo(API_KEY, IdPostBody(ids))
     }
 }

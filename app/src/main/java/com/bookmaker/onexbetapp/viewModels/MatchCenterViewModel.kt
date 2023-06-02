@@ -46,13 +46,7 @@ class MatchCenterViewModel : ViewModel() {
         SPORTS[3] to Sport(mutableListOf(), mutableListOf()),
         SPORTS[4] to Sport(mutableListOf(), mutableListOf())
     )
-    var parsedCount = 0
-    var started = 0
-    private var sent = 0
-    private var finished = 0
-    var allItemsCount = 0
-    private var lastValue = 0
-    private var time: Long = 0
+    private var liveIds = mutableListOf<Long>()
 
     fun updateData() {
         resultData = mapOf(
@@ -66,8 +60,6 @@ class MatchCenterViewModel : ViewModel() {
         viewModelScope.launch {
             val allEvents = Repository.playmaker.getGames()
             if (allEvents.isSuccessful) {
-                allItemsCount = allEvents.body()!!.size
-                parsedCount = 0
                 for (i in allEvents.body()!!) {
                     try {
                         when (i.sport.name) {
@@ -131,10 +123,7 @@ class MatchCenterViewModel : ViewModel() {
                                         }
                                     }
                                 } else { // if event is live
-                                    sent += 1
-                                    GlobalScope.launch {
-                                        loadInfo(i, 0)
-                                    }
+                                    liveIds.add(i.liveId)
                                 }
                             }
 
@@ -198,10 +187,7 @@ class MatchCenterViewModel : ViewModel() {
                                         }
                                     }
                                 } else { // if event is live
-                                    sent += 1
-                                    GlobalScope.launch {
-                                        loadInfo(i, 1)
-                                    }
+                                    liveIds.add(i.liveId)
                                 }
                             }
 
@@ -265,10 +251,7 @@ class MatchCenterViewModel : ViewModel() {
                                         }
                                     }
                                 } else { // if event is live
-                                    sent += 1
-                                    GlobalScope.launch {
-                                        loadInfo(i, 2)
-                                    }
+                                    liveIds.add(i.liveId)
                                 }
                             }
 
@@ -332,10 +315,7 @@ class MatchCenterViewModel : ViewModel() {
                                         }
                                     }
                                 } else { // if event is live
-                                    sent += 1
-                                    GlobalScope.launch {
-                                        loadInfo(i, 3)
-                                    }
+                                    liveIds.add(i.liveId)
                                 }
                             }
 
@@ -399,345 +379,303 @@ class MatchCenterViewModel : ViewModel() {
                                         }
                                     }
                                 } else { // if event is live
-                                    sent += 1
-                                    GlobalScope.launch {
-                                        loadInfo(i, 4)
-                                    }
+                                    liveIds.add(i.liveId)
                                 }
                             }
                         }
                     } catch (e: NullPointerException) {
                     }
-                    parsedCount += 1
+                }
+                val response = Repository.playmaker.getOtherInfo(liveIds)
+                if (response.isSuccessful) {
+                    for (ev in response.body()!!.result) {
+                        when (SPORTS.indexOf(ev.gameTitle)) {
+                            0 -> {
+                                val date =
+                                    ev.event.gameDt.split(" ")[0].split("-") + ev.event.gameDt.split(
+                                        " "
+                                    )[1].split(".")[0].split(":")
+                                val index = resultData[SPORTS[0]]!!.live.map { league -> league.id }
+                                    .indexOf(ev.ids.tournamentId)
+                                if (index != -1) {
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[0]]!!.live[index].list.add(
+                                            Event(
+                                                ev.id,
+                                                ev.event.team1,
+                                                ev.event.team2,
+                                                score1,
+                                                score2,
+                                                "${date[2]}/${date[1]}",
+                                                "${date[3]}:${date[4]}"
+                                            )
+                                        )
+                                    } catch (e: Exception) {
+                                    }
+                                } else if (FOOTBALL_IDS.contains(ev.ids.tournamentId)) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[0]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                } else if (resultData[SPORTS[0]]!!.live.size < 200) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[0]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                            1 -> {
+                                val date =
+                                    ev.event.gameDt.split(" ")[0].split("-") + ev.event.gameDt.split(
+                                        " "
+                                    )[1].split(".")[0].split(":")
+                                val index = resultData[SPORTS[1]]!!.live.map { league -> league.id }
+                                    .indexOf(ev.ids.tournamentId)
+                                if (index != -1) {
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[1]]!!.live[index].list.add(
+                                            Event(
+                                                ev.id,
+                                                ev.event.team1,
+                                                ev.event.team2,
+                                                score1,
+                                                score2,
+                                                "${date[2]}/${date[1]}",
+                                                "${date[3]}:${date[4]}"
+                                            )
+                                        )
+                                    } catch (e: Exception) {
+                                    }
+                                } else if (FOOTBALL_IDS.contains(ev.ids.tournamentId)) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[1]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                } else if (resultData[SPORTS[1]]!!.live.size < 200) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[1]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                            2 -> {
+                                val date =
+                                    ev.event.gameDt.split(" ")[0].split("-") + ev.event.gameDt.split(
+                                        " "
+                                    )[1].split(".")[0].split(":")
+                                val index = resultData[SPORTS[2]]!!.live.map { league -> league.id }
+                                    .indexOf(ev.ids.tournamentId)
+                                if (index != -1) {
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[2]]!!.live[index].list.add(
+                                            Event(
+                                                ev.id,
+                                                ev.event.team1,
+                                                ev.event.team2,
+                                                score1,
+                                                score2,
+                                                "${date[2]}/${date[1]}",
+                                                "${date[3]}:${date[4]}"
+                                            )
+                                        )
+                                    } catch (e: Exception) {
+                                    }
+                                } else if (resultData[SPORTS[2]]!!.live.size < 200) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[2]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                            3 -> {
+                                val date =
+                                    ev.event.gameDt.split(" ")[0].split("-") + ev.event.gameDt.split(
+                                        " "
+                                    )[1].split(".")[0].split(":")
+                                val index = resultData[SPORTS[3]]!!.live.map { league -> league.id }
+                                    .indexOf(ev.ids.tournamentId)
+                                if (index != -1) {
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[3]]!!.live[index].list.add(
+                                            Event(
+                                                ev.id,
+                                                ev.event.team1,
+                                                ev.event.team2,
+                                                score1,
+                                                score2,
+                                                "${date[2]}/${date[1]}",
+                                                "${date[3]}:${date[4]}"
+                                            )
+                                        )
+                                    } catch (e: Exception) {
+                                    }
+                                } else if (resultData[SPORTS[3]]!!.live.size < 200) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[3]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                            4 -> {
+                                val date =
+                                    ev.event.gameDt.split(" ")[0].split("-") + ev.event.gameDt.split(
+                                        " "
+                                    )[1].split(".")[0].split(":")
+                                val index = resultData[SPORTS[4]]!!.live.map { league -> league.id }
+                                    .indexOf(ev.ids.tournamentId)
+                                if (index != -1) {
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[4]]!!.live[index].list.add(
+                                            Event(
+                                                ev.id,
+                                                ev.event.team1,
+                                                ev.event.team2,
+                                                score1,
+                                                score2,
+                                                "${date[2]}/${date[1]}",
+                                                "${date[3]}:${date[4]}"
+                                            )
+                                        )
+                                    } catch (e: Exception) {
+                                    }
+                                } else if (resultData[SPORTS[4]]!!.live.size < 200) {
+                                    val score1 = ev.scores.total.ScoreTeam1
+                                    val score2 = ev.scores.total.ScoreTeam2
+                                    resultData[SPORTS[4]]!!.live.add(
+                                        League(
+                                            ev.ids.tournamentId,
+                                            ev.tournamentTitle,
+                                            ev.categoryTitle,
+                                            mutableListOf(
+                                                Event(
+                                                    ev.id,
+                                                    ev.event.team1,
+                                                    ev.event.team2,
+                                                    score1,
+                                                    score2,
+                                                    "${date[2]}/${date[1]}",
+                                                    "${date[3]}:${date[4]}"
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    _errors.value = allEvents.code().toString()
                 }
             } else {
                 _errors.value = allEvents.code().toString()
             }
-            soonUpdated = true
-            while (started != finished){
-                Log.d("loop", "$sent - sent $finished - finished $started - started $time - time $lastValue - lastValue")
-                if (finished == lastValue){
-                    if(time == 0.toLong()){
-                        time = System.currentTimeMillis()
-                    } else if (System.currentTimeMillis() - time > 1000){
-                        break
-                    }
-                } else{
-                    lastValue = finished
-                    time = 0.toLong()
-                }
-
-
-            }
             _events.value = resultData
         }
     }
-
-
-    private suspend fun loadInfo(i: EventsResponse, sport: Int) {
-        started += 1
-        when (sport) {
-            0 -> {
-                val date =
-                    i.liveDatetime.split("T")[0].split("-") + i.liveDatetime.split("T")[1].split(
-                        ":"
-                    )
-                val index = resultData[SPORTS[0]]!!.live.map { league -> league.id }
-                    .indexOf(i.tournament.id)
-                if (index != -1) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test", i.tournament.name)
-                            resultData[SPORTS[0]]!!.live[index].list.add(
-                                Event(
-                                    i.liveId,
-                                    i.teams[0],
-                                    i.teams[1],
-                                    score1,
-                                    score2,
-                                    "${date[2]}/${date[1]}",
-                                    "${date[3]}:${date[4]}"
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-                } else if (FOOTBALL_IDS.contains(i.tournament.id)) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test", i.tournament.name)
-                            resultData[SPORTS[0]]!!.live.add(
-                                League(
-                                    i.tournament.id,
-                                    i.tournament.name,
-                                    i.category.name,
-                                    mutableListOf(
-                                        Event(
-                                            i.liveId,
-                                            i.teams[0],
-                                            i.teams[1],
-                                            score1,
-                                            score2,
-                                            "${date[2]}/${date[1]}",
-                                            "${date[3]}:${date[4]}"
-                                        )
-                                    )
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-                }
-            }
-            1 -> {
-                val date =
-                    i.liveDatetime.split("T")[0].split("-") + i.liveDatetime.split("T")[1].split(
-                        ":"
-                    )
-                val index = resultData[SPORTS[1]]!!.live.map { league -> league.id }
-                    .indexOf(i.tournament.id)
-                if (index != -1) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test", i.tournament.name)
-                            resultData[SPORTS[1]]!!.live[index].list.add(
-                                Event(
-                                    i.liveId,
-                                    i.teams[0],
-                                    i.teams[1],
-                                    score1,
-                                    score2,
-                                    "${date[2]}/${date[1]}",
-                                    "${date[3]}:${date[4]}"
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                } else if (HOCKEY_IDS.contains(i.tournament.id)) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test", i.tournament.name)
-                            resultData[SPORTS[1]]!!.live.add(
-                                League(
-                                    i.tournament.id,
-                                    i.tournament.name,
-                                    i.category.name,
-                                    mutableListOf(
-                                        Event(
-                                            i.liveId,
-                                            i.teams[0],
-                                            i.teams[1],
-                                            score1,
-                                            score2,
-                                            "${date[2]}/${date[1]}",
-                                            "${date[3]}:${date[4]}"
-                                        )
-                                    )
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                }
-            }
-            2 -> {
-                val date =
-                    i.liveDatetime.split("T")[0].split("-") + i.liveDatetime.split("T")[1].split(
-                        ":"
-                    )
-                val index = resultData[SPORTS[2]]!!.live.map { league -> league.id }
-                    .indexOf(i.tournament.id)
-                if (index != -1) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test2", i.tournament.name)
-
-                            resultData[SPORTS[2]]!!.live[index].list.add(
-                                Event(
-                                    i.liveId,
-                                    i.teams[0],
-                                    i.teams[1],
-                                    score1,
-                                    score2,
-                                    "${date[2]}/${date[1]}",
-                                    "${date[3]}:${date[4]}"
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                } else if (resultData[SPORTS[2]]!!.live.size < 50) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test2", i.tournament.name)
-                            resultData[SPORTS[2]]!!.live.add(
-                                League(
-                                    i.tournament.id,
-                                    i.tournament.name,
-                                    i.category.name,
-                                    mutableListOf(
-                                        Event(
-                                            i.liveId,
-                                            i.teams[0],
-                                            i.teams[1],
-                                            score1,
-                                            score2,
-                                            "${date[2]}/${date[1]}",
-                                            "${date[3]}:${date[4]}"
-                                        )
-                                    )
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                }
-            }
-            3 -> {
-                val date =
-                    i.liveDatetime.split("T")[0].split("-") + i.liveDatetime.split("T")[1].split(
-                        ":"
-                    )
-                val index = resultData[SPORTS[3]]!!.live.map { league -> league.id }
-                    .indexOf(i.tournament.id)
-                if (index != -1) {
-                    val answer = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (answer.isSuccessful) {
-                        try {
-                            val score1 = answer.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = answer.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test3", i.tournament.name)
-                            resultData[SPORTS[3]]!!.live[index].list.add(
-                                Event(
-                                    i.liveId,
-                                    i.teams[0],
-                                    i.teams[1],
-                                    score1,
-                                    score2,
-                                    "${date[2]}/${date[1]}",
-                                    "${date[3]}:${date[4]}"
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                } else if (resultData[SPORTS[3]]!!.live.size < 50) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test3", i.tournament.name)
-                            resultData[SPORTS[3]]!!.live.add(
-                                League(
-                                    i.tournament.id,
-                                    i.tournament.name,
-                                    i.category.name,
-                                    mutableListOf(
-                                        Event(
-                                            i.liveId,
-                                            i.teams[0],
-                                            i.teams[1],
-                                            score1,
-                                            score2,
-                                            "${date[2]}/${date[1]}",
-                                            "${date[3]}:${date[4]}"
-                                        )
-                                    )
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-                }
-            }
-            4 -> {
-                val date =
-                    i.liveDatetime.split("T")[0].split("-") + i.liveDatetime.split("T")[1].split(
-                        ":"
-                    )
-                val index = resultData[SPORTS[4]]!!.live.map { league -> league.id }
-                    .indexOf(i.tournament.id)
-                if (index != -1) {
-                    val answer = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (answer.isSuccessful) {
-                        try {
-                            val score1 = answer.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = answer.body()!!.result.scores.total.ScoreTeam2
-                            Log.d("test4", i.tournament.name)
-                            resultData[SPORTS[4]]!!.live[index].list.add(
-                                Event(
-                                    i.liveId,
-                                    i.teams[0],
-                                    i.teams[1],
-                                    score1,
-                                    score2,
-                                    "${date[2]}/${date[1]}",
-                                    "${date[3]}:${date[4]}"
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                } else if (resultData[SPORTS[4]]!!.live.size < 50) {
-                    val result = Repository.playmaker.getOtherInfo(i.liveId)
-                    if (result.isSuccessful) {
-                        try {
-                            val score1 = result.body()!!.result.scores.total.ScoreTeam1
-                            val score2 = result.body()!!.result.scores.total.ScoreTeam2
-                            resultData[SPORTS[4]]!!.live.add(
-                                League(
-                                    i.tournament.id,
-                                    i.tournament.name,
-                                    i.category.name,
-                                    mutableListOf(
-                                        Event(
-                                            i.liveId,
-                                            i.teams[0],
-                                            i.teams[1],
-                                            score1,
-                                            score2,
-                                            "${date[2]}/${date[1]}",
-                                            "${date[3]}:${date[4]}"
-                                        )
-                                    )
-                                )
-                            )
-                        } catch (e: Exception) {
-                        }
-                    }
-
-                }
-            }
-            else -> {}
-        }
-        finished += 1
-        parsedCount += 1
-    }
-
 }

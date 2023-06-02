@@ -13,6 +13,6 @@ interface PlaymakerService {
     @GET("widget-api/Events")
     suspend fun getGames(@Query("key") key: String): Response<List<EventsResponse>>
 
-    @POST("lds-api/actionLine")
+    @POST("lds-api/actionLines")
     suspend fun getOtherGameInfo(@Query("key") key: String, @Body idPostBody: IdPostBody): Response<ScoreInfo>
 }
