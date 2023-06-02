@@ -120,6 +120,25 @@ class MatchCenterViewModel : ViewModel() {
                                                     )
                                                 )
                                             )
+                                        } else if (resultData[SPORTS[0]]!!.soon.size < 200) { // if we can add one league
+                                            resultData[SPORTS[0]]!!.soon.add(
+                                                League(
+                                                    i.tournament.id,
+                                                    i.tournament.name,
+                                                    i.category.name,
+                                                    mutableListOf(
+                                                        Event(
+                                                            i.prematchId,
+                                                            i.teams[0],
+                                                            i.teams[1],
+                                                            "-",
+                                                            "-",
+                                                            "${date[2]}/${date[1]}",
+                                                            "${date[3]}:${date[4]}"
+                                                        )
+                                                    )
+                                                )
+                                            )
                                         }
                                     }
                                 } else { // if event is live
@@ -184,6 +203,25 @@ class MatchCenterViewModel : ViewModel() {
                                                     )
                                                 )
                                             )
+                                        } else if (resultData[SPORTS[1]]!!.soon.size < 200) { // if we can add one league
+                                            resultData[SPORTS[1]]!!.soon.add(
+                                                League(
+                                                    i.tournament.id,
+                                                    i.tournament.name,
+                                                    i.category.name,
+                                                    mutableListOf(
+                                                        Event(
+                                                            i.prematchId,
+                                                            i.teams[0],
+                                                            i.teams[1],
+                                                            "-",
+                                                            "-",
+                                                            "${date[2]}/${date[1]}",
+                                                            "${date[3]}:${date[4]}"
+                                                        )
+                                                    )
+                                                )
+                                            )
                                         }
                                     }
                                 } else { // if event is live
@@ -229,7 +267,7 @@ class MatchCenterViewModel : ViewModel() {
                                                     "${date[3]}:${date[4]}"
                                                 )
                                             )
-                                        } else if (resultData[SPORTS[2]]!!.soon.size < 50) { // if we can add one league
+                                        } else if (resultData[SPORTS[2]]!!.soon.size < 200) { // if we can add one league
                                             resultData[SPORTS[2]]!!.soon.add(
                                                 League(
                                                     i.tournament.id,
@@ -293,7 +331,7 @@ class MatchCenterViewModel : ViewModel() {
                                                     "${date[3]}:${date[4]}"
                                                 )
                                             )
-                                        } else if (resultData[SPORTS[3]]!!.soon.size < 50) { // if we can add one league
+                                        } else if (resultData[SPORTS[3]]!!.soon.size < 200) { // if we can add one league
                                             resultData[SPORTS[3]]!!.soon.add(
                                                 League(
                                                     i.tournament.id,
@@ -357,7 +395,7 @@ class MatchCenterViewModel : ViewModel() {
                                                     "${date[3]}:${date[4]}"
                                                 )
                                             )
-                                        } else if (resultData[SPORTS[4]]!!.soon.size < 50) { // if we can add one league
+                                        } else if (resultData[SPORTS[4]]!!.soon.size < 200) { // if we can add one league
                                             resultData[SPORTS[4]]!!.soon.add(
                                                 League(
                                                     i.tournament.id,
@@ -415,47 +453,53 @@ class MatchCenterViewModel : ViewModel() {
                                     } catch (e: Exception) {
                                     }
                                 } else if (FOOTBALL_IDS.contains(ev.ids.tournamentId)) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[0]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[0]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 } else if (resultData[SPORTS[0]]!!.live.size < 200) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[0]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[0]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 }
                             }
                             1 -> {
@@ -483,47 +527,53 @@ class MatchCenterViewModel : ViewModel() {
                                     } catch (e: Exception) {
                                     }
                                 } else if (FOOTBALL_IDS.contains(ev.ids.tournamentId)) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[1]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[1]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 } else if (resultData[SPORTS[1]]!!.live.size < 200) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[1]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[1]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 }
                             }
                             2 -> {
@@ -551,26 +601,29 @@ class MatchCenterViewModel : ViewModel() {
                                     } catch (e: Exception) {
                                     }
                                 } else if (resultData[SPORTS[2]]!!.live.size < 200) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[2]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[2]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 }
                             }
                             3 -> {
@@ -598,26 +651,29 @@ class MatchCenterViewModel : ViewModel() {
                                     } catch (e: Exception) {
                                     }
                                 } else if (resultData[SPORTS[3]]!!.live.size < 200) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[3]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[3]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 }
                             }
                             4 -> {
@@ -645,26 +701,29 @@ class MatchCenterViewModel : ViewModel() {
                                     } catch (e: Exception) {
                                     }
                                 } else if (resultData[SPORTS[4]]!!.live.size < 200) {
-                                    val score1 = ev.scores.total.ScoreTeam1
-                                    val score2 = ev.scores.total.ScoreTeam2
-                                    resultData[SPORTS[4]]!!.live.add(
-                                        League(
-                                            ev.ids.tournamentId,
-                                            ev.tournamentTitle,
-                                            ev.categoryTitle,
-                                            mutableListOf(
-                                                Event(
-                                                    ev.id,
-                                                    ev.event.team1,
-                                                    ev.event.team2,
-                                                    score1,
-                                                    score2,
-                                                    "${date[2]}/${date[1]}",
-                                                    "${date[3]}:${date[4]}"
+                                    try {
+                                        val score1 = ev.scores.total.ScoreTeam1
+                                        val score2 = ev.scores.total.ScoreTeam2
+                                        resultData[SPORTS[4]]!!.live.add(
+                                            League(
+                                                ev.ids.tournamentId,
+                                                ev.tournamentTitle,
+                                                ev.categoryTitle,
+                                                mutableListOf(
+                                                    Event(
+                                                        ev.id,
+                                                        ev.event.team1,
+                                                        ev.event.team2,
+                                                        score1,
+                                                        score2,
+                                                        "${date[2]}/${date[1]}",
+                                                        "${date[3]}:${date[4]}"
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
+                                    } catch (e: Exception) {
+                                    }
                                 }
                             }
                         }
