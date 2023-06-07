@@ -12,7 +12,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@color/second"
-        app:layout_constraintBottom_toTopOf="@+id/rvEvents"
+        app:layout_constraintBottom_toTopOf="@+id/rvGames"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
